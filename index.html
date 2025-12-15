@@ -31,19 +31,19 @@
   <div id="missions"></div>
 
   <script>
-    const STORAGE_KEY = "linux_ctf_day2_v2";
+    const STORAGE_KEY = "linux_ctf_day2_v3";
 
     const missions = [
-      { title: "1) Stream Search",      text: "Locate the flag in the stream data.",               hash: "6bbdf9feaee9d3482a9d39d1e5da5a782327dcf67ca127604584f69f57b46d5d" }, // FLAG{pipes_power}
-      { title: "2) Ritual Write",       text: "Create the flag using redirection.",               hash: "6a091beee7ed4b7ad88adf2c4b10e75b80211c33a58f93e4554ff59f1be03933" }, // FLAG{redirect_ritual}
-      { title: "3) CSV Slice",          text: "Extract the correct token from the CSV.",          hash: "9e8ca7bf98a4250c242d1843e2d17f53b3b565e29ea802e465e2a1dfc64cc47c" }, // FLAG{cut_it_out}
-      { title: "4) Uniq Truth",         text: "Find the real flag among repeated lines.",         hash: "95536e5b1f8c93f59adaf6a9b7b77533ffffb401756066a3d2a371592e13bac6" }, // FLAG{sort_uniq_win}
-      { title: "5) Sealed Chest",       text: "Extract the archive and recover the flag.",        hash: "5425d1cf483804a75188e652fc4a0eb3bccb8fbfd3d66f629b41b4b8e0b71b3c" }, // FLAG{tar_treasure}
-      { title: "6) Execute Discovery",  text: "Use find (and/or exec) to locate the flag file.",  hash: "ee94dc356c675d11b0cceedc8b5381bcb71e9563d033459d3d46eb996a6c45bd" }, // FLAG{exec_found}
-      { title: "7) Field Extraction",   text: "Use awk to pull the correct field.",               hash: "bec2f791e29a51e22c5bce279c8c25ca8f19bfe214d6b87854a1298fc6883dd1" }, // FLAG{awk_attack}
-      { title: "8) Hash Match",         text: "Match a file to the target SHA-256 and recover.",  hash: "f6c2d42f1aed4529236781999a571e01e3e1393a276571ae6d96b83f233d30ed" }, // FLAG{sha256_sleuth}
-      { title: "9) Process Trace",      text: "Show your result to the teacher to receive the unlock code.", hash: "5f0e6398c012c6cf6c4f1c8250285eebab62e6242b35d744740756bbaafc942b" }, // FLAG{teacher_ok}
-      { title: "10) Fusion",            text: "Locate the final flag.",                            hash: "1eee19c49502712d8349065e6575bdb0bb084c6eaf356980dc5ee81479c46c63" }  // FLAG{final_fusion}
+      { title: "1) Stream Search",       text: "Recover the correct flag.", hash: "6bbdf9feaee9d3482a9d39d1e5da5a782327dcf67ca127604584f69f57b46d5d" }, // FLAG{pipes_power}
+      { title: "2) Ritual Write",        text: "Recover the correct flag.", hash: "6a091beee7ed4b7ad88adf2c4b10e75b80211c33a58f93e4554ff59f1be03933" }, // FLAG{redirect_ritual}
+      { title: "3) CSV Slice",           text: "Recover the correct flag.", hash: "9e8ca7bf98a4250c242d1843e2d17f53b3b565e29ea802e465e2a1dfc64cc47c" }, // FLAG{cut_it_out}
+      { title: "4) Log Order",           text: "Recover the correct flag.", hash: "a695f437825a681f64fc44c6c2e38416c885109425c51ebbd7c23f0f2ebccbed" }, // FLAG{sort_the_flag_runner}
+      { title: "5) Sealed Chest",        text: "Recover the correct flag.", hash: "5425d1cf483804a75188e652fc4a0eb3bccb8fbfd3d66f629b41b4b8e0b71b3c" }, // FLAG{tar_treasure}
+      { title: "6) One True Flag",       text: "Recover the correct flag.", hash: "6047fc75798b73cb4f551115f47a0fae586e4f0b48e2a9d020ea0b6453c1671b" }, // FLAG{uniq_truth}
+      { title: "7) Execute Discovery",   text: "Recover the correct flag.", hash: "ee94dc356c675d11b0cceedc8b5381bcb71e9563d033459d3d46eb996a6c45bd" }, // FLAG{exec_found}
+      { title: "8) Field Extraction",    text: "Recover the correct flag.", hash: "bec2f791e29a51e22c5bce279c8c25ca8f19bfe214d6b87854a1298fc6883dd1" }, // FLAG{awk_attack}
+      { title: "9) Hash Match",          text: "Recover the correct flag.", hash: "f6c2d42f1aed4529236781999a571e01e3e1393a276571ae6d96b83f233d30ed" }, // FLAG{sha256_sleuth}
+      { title: "10) Fusion",             text: "Recover the correct flag.", hash: "1eee19c49502712d8349065e6575bdb0bb084c6eaf356980dc5ee81479c46c63" }  // FLAG{final_fusion}
     ];
 
     async function sha256(str){
