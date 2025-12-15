@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Linux CTF — Day 2</title>
+  <style>
+    body{font-family:system-ui,-apple-system,Segoe UI,Arial,sans-serif;margin:24px;max-width:980px}
+    .topbar{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:14px}
+    .pill{border:1px solid #ddd;border-radius:999px;padding:8px 12px}
+    .btn{border:1px solid #ccc;border-radius:12px;padding:10px 14px;cursor:pointer;background:#fff}
+    .btn:hover{background:#f6f6f6}
+    .card{border:1px solid #ddd;border-radius:16px;padding:16px;margin:14px 0}
+    .locked{opacity:.45}
+    input{width:100%;padding:10px;border-radius:12px;border:1px solid #ccc;margin-top:10px}
+    .ok{color:#1b7f2a;font-weight:700}
+    .no{color:#b00020;font-weight:700}
+    .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:10px}
+    .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace}
+  </style>
+</head>
+<body>
+
+  <h1>Linux CTF — Day 2</h1>
+  <div class="topbar">
+    <div class="pill"><b>Format:</b> <span class="mono">FLAG{...}</span></div>
+    <div class="pill" id="progressPill"><b>Progress:</b> 0/10</div>
+    <button class="btn" id="resetBtn" type="button">Reset Progress</button>
+  </div>
+
+  <div id="missions"></div>
+
+  <script>
+    const STORAGE_KEY = "linux_ctf_day2_v2";
+
+    const missions = [
+      { title: "1) Stream Search",      text: "Locate the flag in the stream data.",               hash: "6bbdf9feaee9d3482a9d39d1e5da5a782327dcf67ca127604584f69f57b46d5d" }, // FLAG{pipes_power}
+      { title: "2) Ritual Write",       text: "Create the flag using redirection.",               hash: "6a091beee7ed4b7ad88adf2c4b10e75b80211c33a58f93e4554ff59f1be03933" }, // FLAG{redirect_ritual}
+      { title: "3) CSV Slice",          text: "Extract the correct token from the CSV.",          hash: "9e8ca7bf98a4250c242d1843e2d17f53b3b565e29ea802e465e2a1dfc64cc47c" }, // FLAG{cut_it_out}
+      { title: "4) Uniq Truth",         text: "Find the real flag among repeated lines.",         hash: "95536e5b1f8c93f59adaf6a9b7b77533ffffb401756066a3d2a371592e13bac6" }, // FLAG{sort_uniq_win}
+      { title: "5) Sealed Chest",       text: "Extract the archive and recover the flag.",        hash: "5425d1cf483804a75188e652fc4a0eb3bccb8fbfd3d66f629b41b4b8e0b71b3c" }, // FLAG{tar_treasure}
+      { title: "6) Execute Discovery",  text: "Use find (and/or exec) to locate the flag file.",  hash: "ee94dc356c675d11b0cceedc8b5381bcb71e9563d033459d3d46eb996a6c45bd" }, // FLAG{exec_found}
+      { title: "7) Field Extraction",   text: "Use awk to pull the correct field.",               hash: "bec2f791e29a51e22c5bce279c8c25ca8f19bfe214d6b87854a1298fc6883dd1" }, // FLAG{awk_attack}
+      { title: "8) Hash Match",         text: "Match a file to the target SHA-256 and recover.",  hash: "f6c2d42f1aed4529236781999a571e01e3e1393a276571ae6d96b83f233d30ed" }, // FLAG{sha256_sleuth}
+      { title: "9) Process Trace",      text: "Show your result to the teacher to receive the unlock code.", hash: "5f0e6398c012c6cf6c4f1c8250285eebab62e6242b35d744740756bbaafc942b" }, // FLAG{teacher_ok}
+      { title: "10) Fusion",            text: "Locate the final flag.",                            hash: "1eee19c49502712d8349065e6575bdb0bb084c6eaf356980dc5ee81479c46c63" }  // FLAG{final_fusion}
+    ];
+
+    async function sha256(str){
+      const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(str));
+      return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2,"0")).join("");
+    }
+
+    function loadSolved(){ try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]"); } catch { return []; } }
+    function saveSolved(arr){ localStorage.setItem(STORAGE_KEY, JSON.stringify(arr)); }
+
+    function render(){
+      const solved = loadSolved();
+      document.getElementById("progressPill").innerHTML = `<b>Progress:</b> ${solved.length}/10`;
+      const wrap = document.getElementById("missions");
+      wrap.innerHTML = "";
+
+      missions.forEach((m, i) => {
+        const unlocked = (i === 0) || solved.includes(i - 1);
+        const done = solved.includes(i);
+
+        const card = document.createElement("div");
+        card.className = "card " + (unlocked ? "" : "locked");
+        card.innerHTML = `
+          <h3>${m.title} ${done ? '<span class="ok">✔</span>' : ''}</h3>
+          <p>${m.text}</p>
+          ${
+            unlocked ? `
+              <input id="in_${i}" class="mono" placeholder="FLAG{...}" ${done ? "disabled" : ""} />
+              <div class="row">
+                <button class="btn" type="button" ${done ? "disabled" : ""} onclick="check(${i})">Submit</button>
+                <div id="msg_${i}"></div>
+              </div>
+            ` : `<p><i>Locked</i></p>`
+          }
+        `;
+        wrap.appendChild(card);
+      });
+    }
+
+    async function check(i){
+      const solved = loadSolved();
+      const inputEl = document.getElementById("in_" + i);
+      const msgEl = document.getElementById("msg_" + i);
+      const val = (inputEl.value || "").trim();
+
+      if(!/^FLAG\{[A-Za-z0-9_-]+\}$/.test(val)){
+        msgEl.innerHTML = `<span class="no">Invalid format</span>`;
+        return;
+      }
+
+      const h = await sha256(val);
+      if(h === missions[i].hash){
+        if(!solved.includes(i)) solved.push(i);
+        saveSolved(solved);
+        msgEl.innerHTML = `<span class="ok">Correct</span>`;
+        render();
+      } else {
+        msgEl.innerHTML = `<span class="no">Incorrect</span>`;
+      }
+    }
+
+    window.check = check;
+    document.getElementById("resetBtn").addEventListener("click", () => { localStorage.removeItem(STORAGE_KEY); render(); });
+    render();
+  </script>
+</body>
+</html>
